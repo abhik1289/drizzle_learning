@@ -19,12 +19,16 @@ app.get("/", (req, res) => {
 connection();
 
 app.post("/api/add-user", async (req, res) => {
-  const { name, age, email } = req.body;
-  const savedUser = await (await db)
-    .insert(usersTable)
-    .values({ name, age, email });
-  console.log(savedUser);
-  res.json({ savedUser });
+  try {
+    const { name, age, email, password, city, gender, isIphone } = req.body;
+    const savedUser = await (await db)
+      .insert(usersTable)
+      .values({ name, age, email, password, city, gender, isIphone });
+    console.log(savedUser);
+    res.json({ savedUser });
+  } catch (error: any) {
+    res.json({ error: error.message || "" });
+  }
 });
 
 // your routes here
