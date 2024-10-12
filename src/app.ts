@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import { connection } from "./db/dbConfig.js";
+import { usersTable } from "./schema/schema.js";
 
 dotenv.config({ path: "./.env" });
 
@@ -8,7 +9,7 @@ export const envMode = process.env.NODE_ENV?.trim() || "DEVELOPMENT";
 const port = process.env.PORT || 3000;
 
 const app = express();
-
+const db = connection();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -16,6 +17,15 @@ app.get("/", (req, res) => {
   res.send("Hello, World!");
 });
 connection();
+
+app.post("/api/add-user", async (req, res) => {
+  const { name, age, email } = req.body;
+  const savedUser = await (await db)
+    .insert(usersTable)
+    .values({ name, age, email });
+  console.log(savedUser);
+  res.json({ savedUser });
+});
 
 // your routes here
 app.get("*", (req, res) => {
