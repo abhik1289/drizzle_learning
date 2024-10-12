@@ -58,6 +58,16 @@ app.put("/update-user/:id", async (req, res) => {
     });
   res.json({ result });
 });
+
+app.delete("/delete-user/:id", async (req, res) => {
+  const id = parseInt(req.params.id);
+  const result = await (await db)
+    .delete(usersTable)
+    .where(eq(usersTable.id, id))
+    .returning(); // normal returning means simple return the results
+  res.json({ result });
+});
+
 // your routes here
 app.get("*", (req, res) => {
   res.status(404).json({
