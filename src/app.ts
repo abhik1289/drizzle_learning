@@ -232,11 +232,33 @@ app.get("/get-users/:age/:city", async (req, res) => {
 
 app.post("/add-note/:userId", async (req, res) => {
   const { title, text } = req.body;
-  const id = req.params.userId;
-  (await db).insert(notes).values({
-    title,
-    text,
-    userId: id,
+  const id = parseInt(req.params.userId || "");
+  try {
+    console.log(title, text);
+    const saveNote = await (await db).insert(notes).values({
+      userId: id,
+      title,
+      text,
+    });
+    res.status(200).json({
+      success: true,
+      saveNote,
+    });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message || "Internal Server Error" });
+  }
+});
+
+app.get("/getNote/:userId", async (req, res) => {
+  const id = parseInt(req.params.userId || "");
+  const note = await (
+    await db
+  )
+    .select()
+    .from(usersTable)
+    .where(eq(usersTable.id, parseInt(req.params.userId))).fullJoin(notes, eq(usersTable.id, notes.userId));
+  res.status(200).json({
+    note,
   });
 });
 

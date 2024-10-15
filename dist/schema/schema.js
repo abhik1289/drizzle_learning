@@ -1,4 +1,5 @@
 import { integer, pgTable, varchar, pgEnum, boolean, timestamp, } from "drizzle-orm/pg-core";
+// import { createSchema } from 'drizzle-orm/pg';
 export const genderEnum = pgEnum("gender", ["male", "female", "others"]);
 export const usersTable = pgTable("users", {
     id: integer().primaryKey().generatedAlwaysAsIdentity({ startWith: 1000 }),
@@ -9,5 +10,12 @@ export const usersTable = pgTable("users", {
     city: varchar({ length: 30 }).notNull(),
     gender: genderEnum(),
     isIphone: boolean().notNull(),
+    created: timestamp().defaultNow(),
+});
+export const notes = pgTable("notes", {
+    id: integer().primaryKey().generatedAlwaysAsIdentity(),
+    userId: integer().notNull().references(() => usersTable.id),
+    title: varchar().notNull(),
+    text: varchar().notNull(),
     created: timestamp().defaultNow(),
 });

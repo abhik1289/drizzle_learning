@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import { connection } from "./db/dbConfig.js";
-import { usersTable } from "./schema/schema.js";
+import { notes, usersTable } from "./schema/schema.js";
 import { between, eq } from "drizzle-orm";
 dotenv.config({ path: "./.env" });
 export const envMode = process.env.NODE_ENV?.trim() || "DEVELOPMENT";
@@ -214,6 +214,35 @@ app.get("/get-users/:age/:city", async (req, res) => {
     // .offset(1)
     // .orderBy(usersTable.age);
     res.json({ users });
+});
+app.post("/add-note/:userId", async (req, res) => {
+    const { title, text } = req.body;
+    const id = parseInt(req.params.userId || "");
+    try {
+        console.log(title, text);
+        const saveNote = await (await db).insert(notes).values({
+            userId: id,
+            title,
+            text,
+        });
+        res.status(200).json({
+            success: true,
+            saveNote,
+        });
+    }
+    catch (error) {
+        res.status(500).json({ message: error.message || "Internal Server Error" });
+    }
+});
+app.get("/getNote/:userId", async (req, res) => {
+    const id = parseInt(req.params.userId || "");
+    const note = await (await db)
+        .select()
+        .from(usersTable)
+        .where(eq(usersTable.id, parseInt(req.params.userId))).fullJoin(notes, eq(usersTable.id, notes.userId));
+    res.status(200).json({
+        note,
+    });
 });
 // your routes here
 app.get("*", (req, res) => {

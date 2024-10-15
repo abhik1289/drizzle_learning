@@ -22,10 +22,8 @@ export const usersTable = pgTable("users", {
 
 export const notes = pgTable("notes", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  userId: integer("userId")
-    .notNull()
-    .references(() => usersTable.id),
-  title: varchar({}).notNull(),
-  text: varchar({}).notNull(),
+  userId: integer().notNull().references(() => usersTable.id),
+  title: varchar().notNull(),
+  text: varchar().notNull(),
   created: timestamp().defaultNow(),
 });
