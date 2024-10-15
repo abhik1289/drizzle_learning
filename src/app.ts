@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import { connection } from "./db/dbConfig.js";
-import { usersTable } from "./schema/schema.js";
+import { notes, usersTable } from "./schema/schema.js";
 import { and, between, desc, eq, gt } from "drizzle-orm";
 
 dotenv.config({ path: "./.env" });
@@ -228,6 +228,16 @@ app.get("/get-users/:age/:city", async (req, res) => {
   // .offset(1)
   // .orderBy(usersTable.age);
   res.json({ users });
+});
+
+app.post("/add-note/:userId", async (req, res) => {
+  const { title, text } = req.body;
+  const id = req.params.userId;
+  (await db).insert(notes).values({
+    title,
+    text,
+    userId: id,
+  });
 });
 
 // your routes here
